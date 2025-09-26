@@ -45,6 +45,7 @@ This system allows **patients, doctors, and administrators** to interact efficie
 
 
 clinic-appointment-system/
+```
 │
 ├── backend/ # Node.js + Express API
 │ ├── config/ # PostgreSQL + MongoDB connections
@@ -61,6 +62,7 @@ clinic-appointment-system/
 │ └── context/ # Auth context
 │
 └── .env # Environment variables for DB URIs and JWT secret
+```
 
 ---
 
