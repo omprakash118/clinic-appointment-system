@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import server  from './app.js';
-import connectPostDB from './config/postgreSQL.js';
+import {connectPostDB} from './config/postgreSQL.js';
 import connectMongoDB from './config/mongo.js';
 
 // Load environment variables from .env file

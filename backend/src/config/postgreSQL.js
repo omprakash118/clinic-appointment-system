@@ -22,4 +22,5 @@ const connectPostDB = async () => {
 
 // module.exports = { connectPostDB , pool };
 
-export default connectPostDB;
+export  {connectPostDB , pool};
+
