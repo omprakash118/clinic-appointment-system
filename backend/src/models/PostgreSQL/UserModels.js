@@ -5,7 +5,7 @@ import { pool } from '../../config/postgreSQL.js';
 export const createPatientTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS patients (
-            id SERIAL PRIMARY KEY,
+            patient_id SERIAL PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
             age INT NOT NULL,
             gender VARCHAR(10),
@@ -36,12 +36,13 @@ export const insertPatient = async ({name , age, gender,phone,email,hashedPasswo
 
 
 
+
 // ✅ Get All Patients
 export const fetchPatient = async () => {
     const query = `
-        SELECT id,name,age,gender,phone,email,created_at
+        SELECT patient_id,name,age,gender,phone,email,created_at
         FROM patients
-        ORDER BY id ASC;
+        ORDER BY patient_id ASC;
     `;
     const result = await pool.query(query);
     return result.rows;
@@ -53,7 +54,7 @@ export const fetchPatientById = async (id) => {
     const query = `
         SELECT id,name,age,gender,phone,email,created_at
         FROM patients
-        WHERE id = $1;
+        WHERE patient_id = $1;
     `;
     const result = await pool.query(query, [id]);
     return result.rows[0];
@@ -75,12 +76,12 @@ export const updatePatientById = async (id, updatedData) => {
 
     if(columns.length === 0) return null;
 
-    values.push(idx);
+    values.push(id);
 
     const query = `
         UPDATE patients
         SET ${columns.join(", ")}
-        WHERE id = $${idx}
+        WHERE patient_id = $${idx}
         RETURNING *;
     `;
 
@@ -91,6 +92,6 @@ export const updatePatientById = async (id, updatedData) => {
 
 // ✅ Delete Patient By ID
 export const deletePatientById = async (id) => {
-  const result = await pool.query("DELETE FROM patients WHERE id = $1 RETURNING *;", [id]);
+  const result = await pool.query("DELETE FROM patients WHERE patient_id = $1 RETURNING *;", [id]);
   return result.rows[0];
 };

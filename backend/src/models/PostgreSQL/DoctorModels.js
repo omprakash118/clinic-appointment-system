@@ -4,7 +4,7 @@ import { pool } from "../../config/postgreSQL.js";
 export const createDoctorTable = async () => {
   const query = `
     CREATE TABLE IF NOT EXISTS doctors (
-      id SERIAL PRIMARY KEY,
+      doctor_id SERIAL PRIMARY KEY,
       name VARCHAR(100) NOT NULL,
       specialization VARCHAR(100) NOT NULL,
       phone VARCHAR(20) UNIQUE NOT NULL,
@@ -32,13 +32,13 @@ export const insertDoctor = async ({ name, specialization, phone, email , hashed
 
 // ✅ Get All Doctors
 export const fetchDoctors = async () => {
-  const result = await pool.query("SELECT id, name, specialization, phone, email, created_at FROM doctors ORDER BY id ASC;");
+  const result = await pool.query("SELECT doctor_id, name, specialization, phone, email, created_at FROM doctors ORDER BY doctor_id ASC;");
   return result.rows;
 };
 
 // ✅ Get Doctor By ID
 export const fetchDoctorById = async (id) => {
-  const result = await pool.query("SELECT id, name, specialization, phone, email, created_at FROM doctors WHERE id = $1;", [id]);
+  const result = await pool.query("SELECT doctor_id, name, specialization, phone, email, created_at FROM doctors WHERE doctor_id = $1;", [id]);
   return result.rows[0];
 };
 
@@ -64,7 +64,7 @@ export const updateDoctorById = async (id, updatedData) => {
   const query = `
     UPDATE doctors
     SET ${columns.join(", ")}
-    WHERE id = $${idx}
+    WHERE doctor_id = $${idx}
     RETURNING *;
   `;
   // const values = [name, specialization, phone, email, id];
@@ -74,6 +74,6 @@ export const updateDoctorById = async (id, updatedData) => {
 
 // ✅ Delete Doctor
 export const deleteDoctorById = async (id) => {
-  const result = await pool.query("DELETE FROM doctors WHERE id = $1 RETURNING *;", [id]);
+  const result = await pool.query("DELETE FROM doctors WHERE doctor_id = $1 RETURNING *;", [id]);
   return result.rows[0];
 };
