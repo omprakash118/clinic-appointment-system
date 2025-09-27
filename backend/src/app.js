@@ -3,8 +3,10 @@ import { createServer } from 'http';
 import { Server } from "socket.io";
 import pkg from 'cookie-parser'; 
 import cors from 'cors';
+import { createDoctorTable } from "./models/PostgreSQL/DoctorModels.js";
+import { createPatientTable } from "./models/PostgreSQL/UserModels.js";
 
-const { cookieParser } = pkg();
+
 
 // Create an Express application
 const app = express();
@@ -18,6 +20,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
 
 app.use(pkg());
+
+// Import all Routers...
+import doctorRouter from "./routes/doctorRoutes.js";
+import patientRouter from './routes/patientRoutes.js';
+
+// USE All Routers..
+app.use('/api/doctor', doctorRouter);
+app.use('/api/patient', patientRouter);
 
 
 // Create an HTTP server using the Express app
@@ -33,7 +43,13 @@ io.on("connection", (socket) => {
     socket.on("disconnected", () => {
         console.log('❌ Client disconnected :' , socket.id);
     })
-})
+});
+
+(async () => {
+    await createDoctorTable();
+    await createPatientTable();
+})();
+
 
 
 

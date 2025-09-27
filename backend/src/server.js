@@ -10,15 +10,6 @@ dotenv.config({
 
 const PORT = process.env.PORT;
 
-// Create an Express application
-// const app = express();
-
-// Create an HTTP server using the Express app
-// const server = createServer(app);
-
-// Attach Socket.IO to the HTTP server
-// const io = new Server(server);
-
 
 // Start the server and listen on the specified port
 
