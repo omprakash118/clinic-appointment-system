@@ -5,7 +5,7 @@ import pkg from 'cookie-parser';
 import cors from 'cors';
 import { createDoctorTable } from "./models/PostgreSQL/DoctorModels.js";
 import { createPatientTable } from "./models/PostgreSQL/UserModels.js";
-
+import { createAppointmentTable } from "./models/PostgreSQL/AppointmentModels.js";
 
 
 // Create an Express application
@@ -24,10 +24,12 @@ app.use(pkg());
 // Import all Routers...
 import doctorRouter from "./routes/doctorRoutes.js";
 import patientRouter from './routes/patientRoutes.js';
+import appointmentRouter from './routes/appointmentRoutes.js';
 
 // USE All Routers..
 app.use('/api/doctor', doctorRouter);
 app.use('/api/patient', patientRouter);
+app.use('/api/appointment', appointmentRouter);
 
 
 // Create an HTTP server using the Express app
@@ -48,6 +50,7 @@ io.on("connection", (socket) => {
 (async () => {
     await createDoctorTable();
     await createPatientTable();
+    await createAppointmentTable();
 })();
 
 

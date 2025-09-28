@@ -10,6 +10,7 @@ export const createDoctorTable = async () => {
       phone VARCHAR(20) UNIQUE NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL, 
+      availability JSONB,
       access_token TEXT,
       refresh_token TEXT,
       created_at TIMESTAMP DEFAULT NOW()
