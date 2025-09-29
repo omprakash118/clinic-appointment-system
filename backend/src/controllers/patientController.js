@@ -1,10 +1,11 @@
 import {
     insertPatient,
-    fetchPatient,
+    fetchPatients,
     fetchPatientById,
     updatePatientById,
-    deletePatientById
-} from "../models/PostgreSQL/UserModels.js"
+    deletePatientById,
+    findUserByEmail
+} from "../models/PostgreSQL/PatientModels.js"
 
 
 import asyncHandler from "../utils/asyncHandler.js";
@@ -16,18 +17,24 @@ let saltRounds = 10;
 
 // This controller is for creating or adding Patients data...
 export const createPatients = asyncHandler(async (req,res) => {
-    const {name , age, gender,phone,email,password} = req.body;
+    const {name , gender,phone,email,password ,date_of_birth, blood_group, allergies, existing_conditions, current_medications, emergency_contact } = req.body;
 
-    if(!name || !age || !gender || !phone || !email || !password) throw new ApiError(400, "Some field are not filled")
+    if(!name  || !gender || !phone || !email || !password || !date_of_birth || !blood_group  || !existing_conditions || !current_medications) {
+        throw new ApiError(400, "Some field are not filled");
+    }
+
+    const existsUser = await findUserByEmail(email);
+    if (existsUser) throw new ApiError(400, "User with this email already exists");
+ 
 
     //hash the plain password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const patient = await insertPatient({name , age, gender,phone,email,hashedPassword});
+    const patient = await insertPatient({name, phone, email, gender, hashedPassword, date_of_birth, blood_group, allergies, existing_conditions, current_medications, emergency_contact});
 
     if(!patient) throw new ApiError(500, "Something went wrong while creating Patient");
 
-    console.log("Doctor created Successfully !!");
+    console.log("Patient created Successfully !!");
 
     return res.status(201).json({
         patient : patient,
@@ -35,9 +42,29 @@ export const createPatients = asyncHandler(async (req,res) => {
     });
 });
 
+// Promote existing user to patient
+export const promoteUserToPatient = asyncHandler(async (req, res) => {
+    const { user_id, blood_group, allergies, existing_conditions, current_medications, emergency_contact  } = req.body;
+
+    if (!user_id || !blood_group || !allergies || !existing_conditions || !current_medications || !emergency_contact ) throw new ApiError(400, "User ID and age are required");
+    
+
+    const query = `
+        INSERT INTO patients(user_id, blood_group, allergies, existing_conditions, current_medications, emergency_contact)
+        VALUES($1, $2, $3, $4, $5, $6)
+        RETURNING *;
+    `;
+    const result = await pool.query(query, [user_id, blood_group, allergies, existing_conditions, current_medications, emergency_contact]);
+
+    if (!result.rows[0]) throw new ApiError(500, "Failed to promote user to patient");
+
+    return res.status(201).json(new ApiResponse(201, result.rows[0], "✅ User promoted to patient successfully"));
+});
+
+
 // Get Patient data
 export const getPatients = asyncHandler(async (req,res) => {
-    const patient = await fetchPatient();
+    const patient = await fetchPatients();
     return res.status(200).json(new ApiResponse(200, patient, "All Patient fetched successfully"));
 })
 
@@ -61,6 +88,18 @@ export const updatePatient = asyncHandler(async (req,res) => {
     if(!patient_id) throw new ApiError(404, "Patient ID Not assign");
     if(!updatedData) throw new ApiError(404, "Patient data not found");
 
+    if(updatedData.email){
+        const existsUser = await findUserByEmail(updatedData.email);
+        if (existsUser) throw new ApiError(400, "User with this email already exists");
+    }
+ 
+     
+    // ✅ Hash new password if provided
+    if(updatedData.password){
+        const hashedPassword = await bcrypt.hash(updatedData.password, saltRounds);
+        updatedData.password = hashedPassword;
+    }
+
     const patient = await updatePatientById(patient_id, updatedData);
 
     if(!patient) throw new ApiError(404, "Patient Not Updated");
@@ -69,7 +108,7 @@ export const updatePatient = asyncHandler(async (req,res) => {
 });
 
 
-// Delete doctor
+// Delete Patient
 export const deletePatient = asyncHandler(async (req,res) => {
     const patient_id = req.params.id;
     if(!patient_id) throw new ApiError(404, "Patient ID not assign");
@@ -79,5 +118,5 @@ export const deletePatient = asyncHandler(async (req,res) => {
     if(!patient) throw new ApiError(404, "Patient data not found");
 
     return res.status(200).json(new ApiResponse(200, patient, "Patient Deleted Successfully"));
-})
+});
 

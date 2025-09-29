@@ -3,10 +3,14 @@ import { createServer } from 'http';
 import { Server } from "socket.io";
 import pkg from 'cookie-parser'; 
 import cors from 'cors';
-import { createDoctorTable } from "./models/PostgreSQL/DoctorModels.js";
-import { createPatientTable } from "./models/PostgreSQL/UserModels.js";
+// import { createDoctorTable } from "./models/PostgreSQL/DoctorModels.js";
+// import { createPatientTable } from "./models/PostgreSQL/UserModels.js";
 import { createAppointmentTable } from "./models/PostgreSQL/AppointmentModels.js";
-
+import { 
+    createUserTable,
+    createDoctorTable,
+    createPatientTable
+} from "./models/PostgreSQL/UserModels.js";
 
 // Create an Express application
 const app = express();
@@ -25,11 +29,15 @@ app.use(pkg());
 import doctorRouter from "./routes/doctorRoutes.js";
 import patientRouter from './routes/patientRoutes.js';
 import appointmentRouter from './routes/appointmentRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
+import userRouter from "./routes/userRoutes.js";
 
 // USE All Routers..
 app.use('/api/doctor', doctorRouter);
 app.use('/api/patient', patientRouter);
 app.use('/api/appointment', appointmentRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/user', userRouter);
 
 
 // Create an HTTP server using the Express app
@@ -48,6 +56,7 @@ io.on("connection", (socket) => {
 });
 
 (async () => {
+    await createUserTable();
     await createDoctorTable();
     await createPatientTable();
     await createAppointmentTable();
