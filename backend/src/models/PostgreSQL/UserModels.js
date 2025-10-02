@@ -63,7 +63,23 @@ export const createPatientTable = async () => {
   console.log("✅ Patient table is ready");
 };
 
-
+export const doctorSlots = async () => {
+  const query = `
+      CREATE TABLE IF NOT EXISTS doctor_slots (
+        id SERIAL PRIMARY KEY,
+        doctor_id INT NOT NULL REFERENCES doctors(doctor_id) ON DELETE CASCADE,
+        slot_date DATE NOT NULL,
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        is_booked BOOLEAN DEFAULT false,
+        booked_by INT REFERENCES patients(patient_id) ON DELETE SET NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT unique_slot UNIQUE (doctor_id, slot_date, start_time, end_time)
+    );
+  `;
+  await pool.query(query);
+  console.log("✅ Doctor slots table is ready");
+};
 
 // Check Email
 export const findUserByEmail = async (email) => {

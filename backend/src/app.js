@@ -31,6 +31,7 @@ import patientRouter from './routes/patientRoutes.js';
 import appointmentRouter from './routes/appointmentRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
 import userRouter from "./routes/userRoutes.js";
+import slotRouter from './routes/slotsRoutes.js';
 
 // USE All Routers..
 app.use('/api/doctor', doctorRouter);
@@ -38,7 +39,7 @@ app.use('/api/patient', patientRouter);
 app.use('/api/appointment', appointmentRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/user', userRouter);
-
+app.use('/api/slot', slotRouter);
 
 // Create an HTTP server using the Express app
 const server = createServer(app);
