@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const doctorSlotSchema = new mongoose.Schema({
     doctorId : {
@@ -16,6 +17,12 @@ const doctorSlotSchema = new mongoose.Schema({
     endTime: {
         type: String, // "10:00"
         required: true
+    },
+    status : {
+        type: String,
+        enum: ['pending', 'confirmed', 'cancelled'],
+        required: [true, 'Status is required'],
+        default : 'pending'
     },
     bookedBy: {
         type: Number, // <-- PostgreSQL patient.id

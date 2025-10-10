@@ -69,10 +69,9 @@ export const getBookedSlots = asyncHandler(async (req,res) => {
 }); 
 
 
-
 // 📌 Book a new slot
 export const bookSlot = asyncHandler(async (req, res) => {
-  const { doctorId, slotDate, startTime, endTime, patientId } = req.body;
+  const { doctorId, slotDate, startTime, endTime, status = 'pending',patientId } = req.body;
 
   if (!doctorId || !slotDate || !startTime || !endTime || !patientId) {
     throw new ApiError(400, "All fields are required");
@@ -125,6 +124,7 @@ export const bookSlot = asyncHandler(async (req, res) => {
     slotDate,
     startTime,
     endTime,
+    status,
     bookedBy: patientId
   });
   const bookedSlot = await slot.save();
@@ -147,9 +147,8 @@ export const bookSlot = asyncHandler(async (req, res) => {
 });
 
 
-
 // 📌 Cancel a booked slot
-export const cancelSlot = asyncHandler(async (req, res) => {
+export const deleteSlots = asyncHandler(async (req, res) => {
   const { doctorId, slotDate, startTime, patientId } = req.body;
 
   if (!doctorId || !slotDate || !startTime || !patientId) {
@@ -205,9 +204,6 @@ export const cancelSlot = asyncHandler(async (req, res) => {
 });
 
 
-
-
-// 📌 Get all booked slot
 // 📌 Get all booked slots (with doctor & patient info if needed)
 export const getAllBookedSlot = asyncHandler(async (req, res) => {
   // 1. Get all booked slots from Mongo
@@ -254,4 +250,50 @@ export const getAllBookedSlot = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, enrichedSlots, "All booked slots fetched successfully"));
+});
+
+export const confirmSlot = asyncHandler(async (req, res) => {
+  const { slotId } = req.body;
+
+  if (!slotId) throw new ApiError(400, "Slot ID is required");
+
+  const updatedSlot = await DoctorSlotsModel.findByIdAndUpdate(
+    slotId,
+    { status: "confirmed" },
+    { new: true } // return the updated document
+  );
+
+  if (!updatedSlot) throw new ApiError(404, "Slot not found");
+
+  return res.status(200).json(
+    new ApiResponse(200, updatedSlot, "Slot confirmed successfully")
+  );
+});
+
+export const cancelSlot = asyncHandler(async (req, res) => {
+  const { slotId } = req.body;
+
+  if (!slotId) throw new ApiError(400, "Slot ID is required");
+
+  const canceledSlot = await DoctorSlotsModel.findByIdAndUpdate(
+    slotId,
+    { status: "cancelled", bookedBy: null }, // free the slot
+    { new: true }
+  );
+
+  if (!canceledSlot) throw new ApiError(404, "Slot not found");
+
+  return res.status(200).json(
+    new ApiResponse(200, canceledSlot, "Slot cancelled successfully")
+  );
+});
+
+
+export const updateSlots = asyncHandler(async (req,res) => {
+    const slotId = req.slotId;
+    if(!slotId) throw new ApiError(404, "Slot Id not found");
+
+    const { startTime , endTime } = req.body;
+
+
 });
