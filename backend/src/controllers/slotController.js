@@ -117,6 +117,16 @@ export const bookSlot = asyncHandler(async (req, res) => {
   if (existingSlot) {
     throw new ApiError(400, "This slot is already booked");
   }
+  const patientConflict = await DoctorSlotsModel.findOne({
+    bookedBy: patientId,
+    slotDate,
+    $or: [
+      { startTime: { $lte: endTime }, endTime: { $gte: startTime } }
+    ]
+  });
+  if (patientConflict) {
+    throw new ApiError(400, "You already have another booking at this time on the same day");
+  }
 
   // 6. Book the slot in MongoDB
   const slot = new DoctorSlotsModel({
