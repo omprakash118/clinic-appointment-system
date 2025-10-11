@@ -300,10 +300,19 @@ export const cancelSlot = asyncHandler(async (req, res) => {
 
 
 export const updateSlots = asyncHandler(async (req,res) => {
-    const slotId = req.slotId;
+
+  const { slotId, startTime , endTime, slotDate } = req.body;
     if(!slotId) throw new ApiError(404, "Slot Id not found");
 
-    const { startTime , endTime } = req.body;
+    const updatedSlot = await DoctorSlotsModel.findByIdAndUpdate(
+      slotId,
+      {startTime, endTime, slotDate},
+      { new : true}
+    );
 
+    if (!updatedSlot) throw new ApiError(404, "Slot not found");
 
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedSlot, "Slot updated successfully"));
 });
