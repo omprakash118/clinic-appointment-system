@@ -1,0 +1,35 @@
+/* Purpose:
+This file is your custom design layer — used to define project-wide theme rules, such as:
+
+CSS variables for colors and gradients.
+
+Global font families.
+
+Dark/light mode logic.
+
+Transitions and animation presets. */
+
+ /* colors: {
+        primary: "#1D1E18",   // Dark Charcoal (Main background or text)
+        secondary: "#6B8F71", // Moss Green (Buttons, highlights)
+        accent: "#AAD2BA",    // Light Sage (Cards, soft UI elements)
+        soft: "#D9FFF5",      // Soft Mint (Backgrounds)
+        light: "#B9F5D8",     // Pale Mint (Hover states)
+      }, */
+
+:root {
+  --color-primary: #1D1E18;
+  --color-secondary: #6B8F71;
+  --color-accent: #AAD2BA;
+  --color-soft: #D9FFF5;
+  --color-light: #B9F5D8;
+
+  --font-main: 'Inter', sans-serif;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Example dark mode setup */
+[data-theme='dark'] {
+  --color-primary: #0f0f0f;
+  --color-soft: #222;
+}
